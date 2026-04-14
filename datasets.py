@@ -5,9 +5,6 @@ import torch
 from torch.utils.data import Dataset
 
 
-# =========================
-# TRAIN DATASET (FIXED)
-# =========================
 class trainset_loader(Dataset):
     def __init__(self, root):
         self.input_files = sorted(glob.glob(os.path.join(root, "input/*.npy")))
@@ -29,27 +26,16 @@ class trainset_loader(Dataset):
         prj_data = np.load(proj_file).astype(np.float32)
         geometry = np.load(geo_file).astype(np.float32)
 
-        # Convert to tensors
-        input_data = torch.from_numpy(input_data).unsqueeze(0)   # (1, H, W)
+        input_data = torch.from_numpy(input_data).unsqueeze(0)  
         label_data = torch.from_numpy(label_data).unsqueeze(0)
-        prj_data = torch.from_numpy(prj_data)                    # (views, detectors)
+        prj_data = torch.from_numpy(prj_data)                  
 
-        geometry = torch.from_numpy(geometry)                    # (7,)
+        geometry = torch.from_numpy(geometry)                 
 
-        # =========================
-        # HyperFed inputs
-        # =========================
+        option = geometry[:-1]
 
-        # option (used by model)
-        option = geometry[:-1]   # (6,)
+        feature = geometry.clone()  
 
-        # feature MUST be full 7D (IMPORTANT FIX)
-        feature = geometry.clone()   # (7,)
-
-        # =========================
-        # Normalization (Paper Eqn 5)
-        # =========================
-        # Avoid per-sample instability
         min_val = torch.tensor([300, 1.0, 0.5, 300, 300, 300, 5e4])
         max_val = torch.tensor([600, 2.0, 3.0, 600, 600, 600, 5e5])
 
@@ -58,9 +44,7 @@ class trainset_loader(Dataset):
         return input_data, label_data, prj_data, option, feature
 
 
-# =========================
-# TEST DATASET (OPTIONAL FIX)
-# =========================
+
 class testset_loader(Dataset):
     def __init__(self, root):
         self.files_A = []
@@ -98,9 +82,6 @@ class testset_loader(Dataset):
         return input_data, prj_data, file_A, option, feature
 
 
-# =========================
-# TEST WITH LABEL (OPTIONAL)
-# =========================
 class testset_loader_w_label(Dataset):
     def __init__(self, root):
         self.files_A = []
@@ -132,7 +113,7 @@ class testset_loader_w_label(Dataset):
         option = geometry[:-1]
         feature = geometry.clone()
 
-        # normalization
+
         min_val = torch.tensor([300, 1.0, 0.5, 300, 300, 300, 5e4])
         max_val = torch.tensor([600, 2.0, 3.0, 600, 600, 600, 5e5])
 
