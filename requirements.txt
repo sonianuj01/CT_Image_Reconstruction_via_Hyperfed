@@ -1,0 +1,5 @@
+torch>=2.0.0
+torchvision>=0.15.0
+torchsummary>=1.5.1
+scipy>=1.10.0
+numpy>=1.24.0
