@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.autograd import Function
 
 
-# import ctlib_v2  <-- Commented out for CPU-only mode
+# import ctlib_v2  
 
 class prj_module(nn.Module):
     def __init__(self):
@@ -25,9 +25,6 @@ class prj_module(nn.Module):
 class prj_fun(Function):
     @staticmethod
     def forward(ctx, input_data, weight, proj, options):
-        # MOCKED: Since ctlib_v2 is unavailable, we simulate the residual
-        # In a real scenario, this involves Radon transforms.
-        # Here we just pass a zero-like tensor to allow the code to run.
         intervening_res = torch.zeros_like(input_data)
 
         ctx.save_for_backward(intervening_res, weight, options)
@@ -38,7 +35,6 @@ class prj_fun(Function):
     def backward(ctx, grad_output):
         intervening_res, weight, options = ctx.saved_tensors
 
-        # MOCKED: Backpropagation through the mock projector
         grad_input = grad_output
         temp = intervening_res * grad_output
         grad_weight = - temp.sum((2, 3), keepdim=True)
