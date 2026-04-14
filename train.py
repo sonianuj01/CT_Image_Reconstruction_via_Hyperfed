@@ -15,20 +15,20 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--batch_size", type=int, default=2)
 parser.add_argument("--lr", type=float, default=1e-4)
 parser.add_argument("--n_block", type=int, default=50)
-# Changed default to 0 for Windows stability on CPU
+
 parser.add_argument("--n_cpu", type=int, default=0)
 parser.add_argument("--model_save_path", type=str, default="saved_models/1st")
-parser.add_argument('--checkpoint_interval', type=int, default=10) # Set lower for testing
+parser.add_argument('--checkpoint_interval', type=int, default=10)
 
-# Changed num_clients to 5 to match your 5 geometry folders
+
 parser.add_argument("--num_clients", type=int, default=5)
 parser.add_argument("--communication", type=int, default=2)
-parser.add_argument("--epochs", type=int, default=1) # Set to 1 or 2 for a quick test run
+parser.add_argument("--epochs", type=int, default=1)
 parser.add_argument("--mode", type=str, default='hyperfed')
 parser.add_argument("--mu", type=float, default=1e-6)
 opt = parser.parse_args()
 
-# Force CPU as discussed
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -36,7 +36,6 @@ def communication(opt, server_model, models, client_weights):
     with torch.no_grad():
         if opt.mode.lower() == 'hyperfed':
             for key in server_model.state_dict().keys():
-                # Hypernetworks remain local and are NOT shared/averaged
                 if 'Hyper' not in key:
                     temp = torch.zeros_like(server_model.state_dict()[key], dtype=torch.float32)
                     for client_idx in range(len(client_weights)):
